@@ -4,11 +4,11 @@ import ResultListingPage from '../pages/result-listing';
 
 const router = createBrowserRouter([
   {
-    path: 'standard',
+    path: '/standard',
     element: <InspectionCreateUpdatePage isEditing={false} />,
   },
   {
-    path: 'history',
+    path: '/history',
     element: <ResultListingPage />,
   },
 ]);

@@ -1,10 +1,10 @@
-// const baseConfig = require('../../tailwind.config');
+const baseConfig = require('../../tailwind.config');
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
 const _ = require('lodash');
 
 /** @type {import('tailwindcss').Config} */
-module.exports = _.mergeWith({
+module.exports = _.mergeWith(baseConfig, {
   content: [
     join(
       __dirname,

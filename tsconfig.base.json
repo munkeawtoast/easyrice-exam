@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@libs/ui/utils": ["libs/ui/src/lib/utils"],
+      "@libs/ui/utils": ["libs/ui/src/lib/utils.ts"],
       "@libs/ui/*": ["libs/ui/src/lib/components/*"]
     }
   },

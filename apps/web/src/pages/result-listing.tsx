@@ -1,9 +1,13 @@
-import React from 'react';
+import { Button } from '@libs/ui/button';
 
 type Props = {};
 
 const ResultListingPage = (props: Props) => {
-  return <div>ResultListingPage</div>;
+  return (
+    <div>
+      <Button>Test</Button>
+    </div>
+  );
 };
 
 export default ResultListingPage;
