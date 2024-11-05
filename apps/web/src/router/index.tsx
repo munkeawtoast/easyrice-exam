@@ -1,11 +1,11 @@
 import { Link, createBrowserRouter } from 'react-router-dom';
-import InspectionCreateUpdatePage from '../pages/inspection-cu';
+import InspectionFormPage from '../pages/inspection-form';
 import ResultListingPage from '../pages/result-listing';
 
 const router = createBrowserRouter([
   {
     path: '/standard',
-    element: <InspectionCreateUpdatePage isEditing={false} />,
+    element: <InspectionFormPage isEditing={false} />,
   },
   {
     path: '/history',
