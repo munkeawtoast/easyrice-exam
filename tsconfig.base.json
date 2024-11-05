@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@easyrice-exam/models": ["libs/models/src/index.ts"],
       "@libs/ui/*": ["libs/ui/src/lib/components/*"],
       "@libs/ui/utils": ["libs/ui/src/lib/utils.ts"]
     }
