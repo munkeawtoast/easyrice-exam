@@ -11,7 +11,11 @@ module.exports = {
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Kanit', 'ui-sans-serif', 'system-ui'],
+      },
+    },
   },
   plugins: [],
 };
