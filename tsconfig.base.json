@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@easyrice-exam/ui": ["libs/ui/src/index.ts"]
+      "@libs/ui/utils": ["libs/ui/src/lib/utils"],
+      "@libs/ui/*": ["libs/ui/src/lib/components/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]

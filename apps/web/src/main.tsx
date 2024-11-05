@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { BrowserRouter, RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 
 import router from './router';
 import Navbar from './components/navbar';
@@ -11,6 +11,6 @@ const root = ReactDOM.createRoot(
 root.render(
   <StrictMode>
     <Navbar />
-    <RouterProvider router={router} />
+    {/* <RouterProvider router={router} /> */}
   </StrictMode>
 );

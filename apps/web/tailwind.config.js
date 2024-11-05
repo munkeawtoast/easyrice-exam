@@ -1,8 +1,10 @@
+// const baseConfig = require('../../tailwind.config');
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind');
 const { join } = require('path');
+const _ = require('lodash');
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+module.exports = _.mergeWith({
   content: [
     join(
       __dirname,
@@ -10,12 +12,4 @@ module.exports = {
     ),
     ...createGlobPatternsForDependencies(__dirname),
   ],
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Kanit', 'ui-sans-serif', 'system-ui'],
-      },
-    },
-  },
-  plugins: [],
-};
+});
