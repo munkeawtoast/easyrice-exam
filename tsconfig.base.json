@@ -16,8 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["libs/ui/src/lib/*"],
-
-      "@easyrice-exam/models": ["libs/models/src/index.ts"],
+      "@libs/database": ["libs/database/src/index.ts"],
+      "@libs/models": ["libs/models/src/index.ts"],
       "@libs/ui/*": ["libs/ui/src/lib/ui/*"],
       "@libs/ui/hooks/*": ["libs/ui/src/lib/hooks/*"],
       "@libs/ui/libs/*": ["libs/ui/src/lib/libs/*"],

@@ -5,12 +5,12 @@ export enum InspectionSamplingPoints {
 }
 
 export enum InspectionSamplingPointConditions {
-  GE = 'GE', // Greater than or equal
-  LE = 'LE', // Less than or equal
-  GT = 'GT', // Greater than
-  LT = 'LT', // Less than
-  EQ = 'EQ', // Equal
-  NE = 'NE', // Not equal
+  GE = 'GE',
+  LE = 'LE',
+  GT = 'GT',
+  LT = 'LT',
+  EQ = 'EQ',
+  NE = 'NE',
 }
 
 export type RiceSubStandard = {
@@ -24,15 +24,9 @@ export type RiceSubStandard = {
   value?: number;
 };
 export type RiceStandard = {
-  name?: string;
+  type: string;
+  id: string;
+  name: string;
   createDate: string;
-  inspectionID: string;
-  standardID?: string;
-  note?: string;
-  standardName?: string;
-  samplingDate?: string;
-  samplingPoint?: string[];
-  price?: number;
-  imageLink?: string;
   standardData: RiceSubStandard[];
 };

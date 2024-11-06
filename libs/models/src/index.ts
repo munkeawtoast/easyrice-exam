@@ -1,2 +1,3 @@
-export * from './grain-analysis';
+export * from './raw-inspection';
 export * from './standard';
+export * from './rice-inspection-result';

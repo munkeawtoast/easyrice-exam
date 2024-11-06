@@ -5,7 +5,7 @@ export type RiceGrain = {
   type: string;
 };
 
-export type RiceAnalysis = {
+export type RiceRawAnalysis = {
   requestID: string;
   imageURL: string;
   grains: RiceGrain[];

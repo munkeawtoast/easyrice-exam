@@ -5,6 +5,9 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.682.0",
+    "@aws-sdk/lib-dynamodb": "^3.685.0",
+    "@aws-sdk/util-dynamodb": "^3.685.0",
     "@fastify/autoload": "~5.7.1",
     "@fastify/sensible": "~5.2.0",
     "@hookform/resolvers": "^3.9.1",
@@ -22,6 +25,7 @@
     "date-fns": "^4.1.0",
     "fastify": "~4.13.0",
     "fastify-plugin": "~4.5.0",
+    "fastify-type-provider-zod": "^4.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.454.0",
     "react": "18.3.1",
