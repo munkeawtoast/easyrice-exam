@@ -1,0 +1,16 @@
+name: 🟣 Deploy to ECR DEV
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  eventhandler-bot:
+    uses: munkeawtoast/easyrice-exam/.github/workflows/deploy-to-ecr.yml@main
+    name: Deploy
+    with:
+      PROJECT_NAME: api
+      STAGE: dev
+      ECR_REPOSITORY: easyrice-test/api
+      TAG: ${{ github.sha }}
