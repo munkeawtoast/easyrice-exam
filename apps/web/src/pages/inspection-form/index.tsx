@@ -1,15 +1,3 @@
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { format } from 'date-fns';
@@ -46,9 +34,11 @@ type Props =
     };
 
 const formSchema = z.object({
-  id: z.string(),
-  fromDate: z.date(),
-  toDate: z.date(),
+  name: z.string(),
+  standard: z.string(),
+  file: z.any(),
+  note: z.string().optional(),
+  price: z.number().optional(),
 });
 
 const InspectionFormPage = (props: Props) => {
@@ -123,47 +113,6 @@ const InspectionFormPage = (props: Props) => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="toDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-start">
-                    <FormLabel>To date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={'outline'}
-                            className={cn(
-                              'w-[240px] pl-3 text-left font-normal',
-                              !field.value && 'text-muted-foreground'
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, 'PPP')
-                            ) : (
-                              <span>Please select to date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          // disabled={(date) =>
-                          //   date > new Date() || date < new Date('1900-01-01')
-                          // }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             <div className="flex justify-between gap-4">
               <Button type="reset" variant="link" className="text-red-600">
@@ -176,28 +125,6 @@ const InspectionFormPage = (props: Props) => {
           </form>
         </Form>
       </Card>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-        </Table>
-      </div>
     </>
   );
 };

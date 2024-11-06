@@ -1,6 +1,6 @@
 import { Link, createBrowserRouter } from 'react-router-dom';
 import InspectionFormPage from '../pages/inspection-form';
-import ResultListingPage from '../pages/result-listing';
+import HistoryListingPage from '../pages/history-listing';
 
 const router = createBrowserRouter([
   {
@@ -9,7 +9,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/history',
-    element: <ResultListingPage />,
+    element: <HistoryListingPage />,
   },
 ]);
 

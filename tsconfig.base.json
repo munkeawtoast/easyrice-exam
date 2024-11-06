@@ -15,13 +15,14 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@/*": ["libs/ui/src/lib/*"],
       "@easyrice-exam/models": ["libs/models/src/index.ts"],
-      "@libs/ui/*": ["libs/ui/src/lib/components/*"],
+      "@libs/ui/*": ["libs/ui/src/lib/ui/*"],
       "@libs/ui/utils": ["libs/ui/src/lib/utils"],
       "@libs/ui/libs/*": ["libs/ui/src/lib/libs/*"],
-      "@libs/ui/hooks/*": ["libs/ui/src/lib/hooks/*"],
+      "@libs/ui/hooks/*": ["libs/ui/src/lib/hooks/*"]
+
       // binding is for shadcn only, for other uses define a new route
-      "@/*": ["libs/ui/src/lib/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
