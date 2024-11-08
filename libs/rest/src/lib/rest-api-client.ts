@@ -6,7 +6,7 @@ type Infer<T extends ZodSchema> = T extends ZodSchema<infer R> ? R : never;
 
 type EmptySchema = ZodSchema<never>;
 
-export type RequestSchema<
+export type ApiSchema<
   QueryParams extends ZodSchema = ZodSchema,
   Body extends ZodSchema = ZodSchema,
   UrlParams extends ZodSchema = ZodSchema
@@ -14,6 +14,7 @@ export type RequestSchema<
   querystring?: QueryParams;
   body?: Body;
   params?: UrlParams;
+  response?: Record<number, ZodSchema>;
 };
 
 declare module 'axios' {
@@ -74,7 +75,7 @@ export class RestApiClient {
     UrlParams extends ZodSchema = EmptySchema
   >(
     config: ApiClientConfig<QueryParams, Body, UrlParams>,
-    schema: RequestSchema<QueryParams, Body, UrlParams> = {}
+    schema: ApiSchema<QueryParams, Body, UrlParams> = {}
   ) {
     return this.client.request<ResDto>(config);
   }

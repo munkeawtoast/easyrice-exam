@@ -1,33 +1,12 @@
 import { InspectionSamplingPointConditions } from '@libs/models';
-import { FastifyPluginAsync } from 'fastify';
+import {
+  HistoryListResponseDtoSchema,
+  HistoryResponseSchema,
+} from '@libs/dto/history.dto';
 import { z } from 'zod';
+import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 
-const StandardDataSchema = z.object({
-  key: z.string().optional(),
-  minLength: z.number().optional(),
-  maxLength: z.number().optional(),
-  shape: z.array(z.string()),
-  name: z.string().optional(),
-  conditionMin: z.nativeEnum(InspectionSamplingPointConditions),
-  conditionMax: z.nativeEnum(InspectionSamplingPointConditions),
-  value: z.number().optional(),
-});
-
-const HistoryResponseSchema = z.object({
-  name: z.string().optional(),
-  createDate: z.string().datetime().optional(),
-  inspectionID: z.string().optional(),
-  standardID: z.string().optional(),
-  note: z.string().optional(),
-  standardName: z.string().optional(),
-  samplingDate: z.string().datetime().optional(),
-  samplingPoint: z.array(z.string()).optional(),
-  price: z.number().optional(),
-  imageLink: z.string().optional(),
-  standardData: z.array(StandardDataSchema),
-});
-
-const plugin: FastifyPluginAsync = async function (fastify) {
+const plugin: FastifyPluginAsyncZod = async function (fastify) {
   fastify.register(
     (instance) => {
       // GET /history
@@ -41,7 +20,7 @@ const plugin: FastifyPluginAsync = async function (fastify) {
             inspectionID: z.string(),
           }),
           response: {
-            200: HistoryListResponseSchema,
+            200: HistoryListResponseDtoSchema,
           },
         },
         handler: async (request, reply) => {
@@ -62,12 +41,7 @@ const plugin: FastifyPluginAsync = async function (fastify) {
             200: HistoryResponseSchema,
           },
         },
-        handler: async (request, reply) => {
-          // Implement your handler logic here
-          return {
-            standardData: [],
-          };
-        },
+        handler: async (request, reply) => {},
       });
 
       // POST /history

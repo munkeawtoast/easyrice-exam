@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { InspectionSamplingPointConditions } from '../standard';
-import { RequestSchema } from './utils';
+import { ApiSchema } from '@libs/rest';
 
 export const StandardDto = z.object({
   name: z.string(),
@@ -20,7 +20,7 @@ export const StandardDto = z.object({
   ),
 });
 
-export const QueryStandardRequestSchema: RequestSchema = {
+export const QueryStandardRequestDtoSchema: ApiSchema = {
   querystring: z.object({}),
   body: z.object({}),
   params: z.object({}),
