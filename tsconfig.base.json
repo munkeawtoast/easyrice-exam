@@ -21,7 +21,8 @@
       "@libs/ui/*": ["libs/ui/src/lib/ui/*"],
       "@libs/ui/hooks/*": ["libs/ui/src/lib/hooks/*"],
       "@libs/ui/libs/*": ["libs/ui/src/lib/libs/*"],
-      "@libs/ui/utils": ["libs/ui/src/lib/utils"]
+      "@libs/ui/utils": ["libs/ui/src/lib/utils"],
+      "@libs/dto/*": ["libs/models/src/dto/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
