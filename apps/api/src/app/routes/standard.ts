@@ -1,9 +1,9 @@
 import { InspectionSamplingPointConditions } from '@libs/models';
+import { FastifyInstance } from 'fastify';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
-
-const plugin: FastifyPluginAsyncZod = async function (fastify) {
+export default async function (fastify: FastifyInstance) {
   fastify.register(
     (instance) => {
       instance.route({
@@ -22,6 +22,4 @@ const plugin: FastifyPluginAsyncZod = async function (fastify) {
     },
     { prefix: '/standard' }
   );
-};
-
-export default plugin;
+}
