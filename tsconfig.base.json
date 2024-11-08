@@ -16,13 +16,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["libs/ui/src/lib/*"],
+      "@easyrice-exam/rest": ["libs/rest/src/index.ts"],
       "@libs/database": ["libs/database/src/index.ts"],
+      "@libs/dto/*": ["libs/models/src/dto/*"],
       "@libs/models": ["libs/models/src/index.ts"],
       "@libs/ui/*": ["libs/ui/src/lib/ui/*"],
       "@libs/ui/hooks/*": ["libs/ui/src/lib/hooks/*"],
       "@libs/ui/libs/*": ["libs/ui/src/lib/libs/*"],
-      "@libs/ui/utils": ["libs/ui/src/lib/utils"],
-      "@libs/dto/*": ["libs/models/src/dto/*"]
+      "@libs/ui/utils": ["libs/ui/src/lib/utils"]
     }
   },
   "exclude": ["node_modules", "tmp"]
