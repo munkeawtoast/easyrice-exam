@@ -9,12 +9,13 @@ type EmptySchema = ZodSchema<never>;
 export type ApiSchema<
   QueryParams extends ZodSchema = ZodSchema,
   Body extends ZodSchema = ZodSchema,
-  UrlParams extends ZodSchema = ZodSchema
+  UrlParams extends ZodSchema = ZodSchema,
+  ResponseSchema = Record<number, ZodSchema>
 > = {
   querystring?: QueryParams;
   body?: Body;
   params?: UrlParams;
-  response?: Record<number, ZodSchema>;
+  response?: ResponseSchema;
 };
 
 declare module 'axios' {

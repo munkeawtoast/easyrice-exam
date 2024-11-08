@@ -1,7 +1,7 @@
-import { InspectionSamplingPointConditions } from '@libs/models';
 import {
-  HistoryListResponseDtoSchema,
-  HistoryResponseSchema,
+  GetHistoryApiSchema,
+  GetHistoryResponseSchema,
+  ListHistoryApiSchema,
 } from '@libs/dto/history.dto';
 import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
@@ -15,33 +15,14 @@ export default async function (fastify: FastifyInstance) {
         route.route({
           method: 'GET',
           url: '/',
-          schema: {
-            querystring: z.object({
-              fromDate: z.string().datetime(),
-              toDate: z.string().datetime(),
-              inspectionID: z.string(),
-            }),
-            response: {
-              200: HistoryListResponseDtoSchema,
-            },
-          },
-          handler: async (request, reply) => {
-            // Implement your handler logic here
-            return { data: [] };
-          },
+          schema: ListHistoryApiSchema,
+          handler: async (request, reply) => {},
         });
 
         route.route({
           method: 'GET',
           url: '/:id',
-          schema: {
-            params: z.object({
-              id: z.string(),
-            }),
-            response: {
-              200: HistoryResponseSchema,
-            },
-          },
+          schema: GetHistoryApiSchema,
           handler: async (request, reply) => {},
         });
 
@@ -49,9 +30,9 @@ export default async function (fastify: FastifyInstance) {
           method: 'POST',
           url: '/',
           schema: {
-            body: HistoryResponseSchema,
+            body: GetHistoryResponseSchema,
             response: {
-              200: HistoryResponseSchema,
+              200: GetHistoryResponseSchema,
             },
           },
           handler: async (request, reply) => {

@@ -1,22 +1,19 @@
+import { ListStandardApiSchema } from '@libs/dto/standard.dto';
 import { InspectionSamplingPointConditions } from '@libs/models';
 import { FastifyInstance } from 'fastify';
-import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
+import {
+  FastifyPluginAsyncZod,
+  ZodTypeProvider,
+} from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 export default async function (fastify: FastifyInstance) {
-  fastify.register(
+  fastify.withTypeProvider<ZodTypeProvider>().register(
     (instance) => {
       instance.route({
         method: 'GET',
         url: '/',
-        schema: {
-          querystring: z.object({
-            name: z.string().min(4),
-          }),
-          response: {
-            200: responseSchema,
-          },
-        },
+        schema: ListStandardApiSchema,
         handler: (req, res) => {},
       });
     },

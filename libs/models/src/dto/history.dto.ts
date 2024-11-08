@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { StandardDto } from './standard.dto';
+import { StandardSchemaDto, SubStandardSchemaDto } from './standard.dto';
 import { ApiSchema } from '@libs/rest';
 
-export const HistoryDto = z.object({
+export const HistoryDtoSchema = z.object({
   name: z.string().optional(),
   createDate: z.string().datetime().optional(),
   inspectionID: z.string().optional(),
@@ -12,25 +12,57 @@ export const HistoryDto = z.object({
   samplingDate: z.string().datetime().optional(),
   samplingPoint: z.array(z.string()).optional(),
   price: z.number().optional(),
-  imageLink: z.string().optional(),
-  standardData: z.array(StandardDto),
 });
 
-export const HistoryResponseSchema = HistoryDto;
+export const FullHistoryDtoSchema = HistoryDtoSchema.merge(
+  z.object({
+    imageLink: z.string().url(),
+    standardData: z.array(SubStandardSchemaDto),
+  })
+);
 
-export const HistoryApiSchema: ApiSchema = {
+export const GetHistoryResponseSchema = FullHistoryDtoSchema;
+
+export const GetHistoryApiSchema = {
   params: z.object({
     id: z.string(),
   }),
   response: {
-    200: HistoryResponseSchema,
+    200: GetHistoryResponseSchema,
   },
-};
+} satisfies ApiSchema;
 
-export const HistoryListResponseDtoSchema = z.object({
-  data: z.array(HistoryDto),
+export type HistoryDto = z.infer<typeof HistoryDtoSchema>;
+
+export const ListHistoryResponseSchema = z.object({
+  data: z.array(HistoryDtoSchema),
 });
 
-export type HistoryListResponseDto = z.infer<
-  typeof HistoryListResponseDtoSchema
->;
+export const ListHistoryApiSchema = {
+  querystring: z.object({
+    fromDate: z.string().datetime(),
+    toDate: z.string().datetime(),
+    inspectionID: z.string(),
+  }),
+  response: {
+    200: ListHistoryResponseSchema,
+  },
+} satisfies ApiSchema;
+
+export type HistoryListResponseDto = z.infer<typeof ListHistoryResponseSchema>;
+
+export const CreateHistoryApiSchema = {
+  body: FullHistoryDtoSchema,
+  response: {
+    201: FullHistoryDtoSchema,
+  },
+} satisfies ApiSchema;
+
+export const DeleteHistoryApiSchema = {
+  body: z.object({
+    inspectionID: z.array(z.string()),
+  }),
+  response: {
+    200: z.string(),
+  },
+};
