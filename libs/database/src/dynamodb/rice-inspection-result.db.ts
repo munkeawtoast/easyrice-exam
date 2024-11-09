@@ -83,7 +83,7 @@ export class RiceInspectionResultDatabase
       TableName: this.ddbTable,
       Item: {
         ...item,
-        id: randomUUID(),
+        id: item.id ?? randomUUID(),
       },
     });
     await this.dynamodbClient.send(command);
