@@ -15,13 +15,17 @@ export const SubStandardSchemaDto = z.object({
 export const StandardSchemaDto = z.object({
   name: z.string(),
   id: z.string(),
-  createDate: z.string().datetime(),
+  createDate: z.string().datetime().optional(),
   standardName: z.string(),
   standardData: z.array(SubStandardSchemaDto),
 });
 
+export type StandardDto = z.infer<typeof StandardSchemaDto>;
+
+export const ListStandardResponseSchema = z.array(StandardSchemaDto);
+
 export const ListStandardApiSchema = {
   response: {
-    200: z.array(StandardSchemaDto),
+    200: ListStandardResponseSchema,
   },
 } satisfies ApiSchema;

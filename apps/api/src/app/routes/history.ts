@@ -2,6 +2,7 @@ import {
   GetHistoryApiSchema,
   GetHistoryResponseSchema,
   ListHistoryApiSchema,
+  ListHistoryResopnseDto,
 } from '@libs/dto/history.dto';
 import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
@@ -19,24 +20,22 @@ export default async function (fastify: FastifyInstance) {
           url: '/',
           schema: ListHistoryApiSchema,
           handler: async (request, reply) => {
+            const result: ListHistoryResopnseDto['data'] = [];
             if (request.query.inspectionID) {
-              const record = await riceInspectorService.getRiceInspectionResult(
-                {
-                  id: request.query.inspectionID,
-                }
-              );
+              const {
+                standardData: _,
+                imageLink: __,
+                ...record
+              } = await riceInspectorService.getRiceInspectionResult({
+                id: request.query.inspectionID,
+              });
               if (
                 !record.createDate ||
                 record.createDate < request.query.fromDate ||
                 record.createDate > request.query.toDate
               ) {
-                return {
-                  data: [],
-                };
               } else {
-                return {
-                  data: [record],
-                };
+                result.push(record);
               }
             } else {
               const records =
@@ -44,10 +43,9 @@ export default async function (fastify: FastifyInstance) {
                   fromDate: request.query.fromDate,
                   toDate: request.query.toDate,
                 });
-              return {
-                data: records,
-              };
+              result.push(...records);
             }
+            return reply.code(200).send({ data: result });
           },
         });
 
@@ -55,7 +53,12 @@ export default async function (fastify: FastifyInstance) {
           method: 'GET',
           url: '/:id',
           schema: GetHistoryApiSchema,
-          handler: async (request, reply) => {},
+          handler: async (request, reply) => {
+            const record = await riceInspectorService.getRiceInspectionResult({
+              id: request.params.id,
+            });
+            return reply.code(200).send(record);
+          },
         });
 
         route.route({
@@ -68,8 +71,8 @@ export default async function (fastify: FastifyInstance) {
             },
           },
           handler: async (request, reply) => {
-            // Implement your handler logic here
-            return request.body;
+            await riceInspectorService.createRiceInspectionResult(request.body);
+            return reply.code(201).send(request.body);
           },
         });
 
@@ -85,8 +88,10 @@ export default async function (fastify: FastifyInstance) {
             },
           },
           handler: async (request, reply) => {
-            // Implement your handler logic here
-            return 'Success';
+            await riceInspectorService.deleteRiceInspectionResult(
+              request.body.inspectionID
+            );
+            return reply.code(200).send('success');
           },
         });
       },

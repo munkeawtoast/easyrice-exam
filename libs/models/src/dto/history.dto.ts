@@ -46,6 +46,8 @@ export const ListHistoryResponseSchema = z.object({
   data: z.array(HistoryDtoSchema),
 });
 
+export type ListHistoryResopnseDto = z.infer<typeof ListHistoryResponseSchema>;
+
 export const ListHistoryApiSchema = {
   querystring: z.object({
     fromDate: z.string().datetime(),

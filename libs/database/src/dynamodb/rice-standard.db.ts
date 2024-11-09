@@ -13,6 +13,8 @@ export interface IDdbRiceStandardDatabase {
   ) => Promise<RiceStandard[]>;
 }
 
+export type RiceStandardQueryOptions = {};
+
 export class RiceStandardDatabase implements IDdbRiceStandardDatabase {
   private ddbTable = 'easyrice-standard';
   private dynamodbClient: DynamoDBDocumentClient;
@@ -41,3 +43,5 @@ export class RiceStandardDatabase implements IDdbRiceStandardDatabase {
     return a.Items as RiceStandard[];
   }
 }
+
+export const ddbRiceStandardDatabase = new RiceStandardDatabase();
