@@ -55,12 +55,16 @@ const HistoryListingPage = (props: Props) => {
     // ✅ This will be type-safe and validated.
     console.log(values);
   }
+
+  function resetForm() {
+    form.reset();
+  }
   return (
     <>
       <Form {...form}>
         <Card className="p-6">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="flex justify-between gap-4">
+            <div className="flex flex-col md:flex-row justify-between gap-4 xl:gap-12">
               <FormField
                 control={form.control}
                 name="id"
@@ -68,7 +72,11 @@ const HistoryListingPage = (props: Props) => {
                   <FormItem className="flex flex-col justify-start">
                     <FormLabel>ID</FormLabel>
                     <FormControl>
-                      <Input placeholder="Search with ID" {...field} />
+                      <Input
+                        placeholder="Search with ID"
+                        className="lg:w-[280px]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,7 +94,7 @@ const HistoryListingPage = (props: Props) => {
                           <Button
                             variant={'outline'}
                             className={cn(
-                              'w-[240px] pl-3 text-left font-normal',
+                              'w-full md:w-[240px] lg:w-[280px] pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground'
                             )}
                           >
@@ -99,7 +107,7 @@ const HistoryListingPage = (props: Props) => {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="end">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -128,7 +136,7 @@ const HistoryListingPage = (props: Props) => {
                           <Button
                             variant={'outline'}
                             className={cn(
-                              'w-[240px] pl-3 text-left font-normal',
+                              'w-full md:w-[240px] lg:w-[280px] pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground'
                             )}
                           >
@@ -141,7 +149,7 @@ const HistoryListingPage = (props: Props) => {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="end">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -158,8 +166,13 @@ const HistoryListingPage = (props: Props) => {
                 )}
               />
             </div>
-            <div className="flex justify-between gap-4">
-              <Button type="reset" variant="link" className="text-red-600">
+            <div className="flex justify-between  gap-4">
+              <Button
+                onClick={resetForm}
+                type="reset"
+                variant="link"
+                className="text-red-600"
+              >
                 Clear filter
               </Button>
               <Button type="submit">

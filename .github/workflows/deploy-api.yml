@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
 jobs:
-  eventhandler-bot:
+  api:
     uses: munkeawtoast/easyrice-exam/.github/workflows/deploy-to-ecr.yml@main
     name: Deploy
     with:
