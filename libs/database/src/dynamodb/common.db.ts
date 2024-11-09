@@ -1,3 +1,3 @@
-export type BaseQueryInput = {
+export type BaseQueryOptions = {
   limit: number;
 };

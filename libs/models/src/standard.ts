@@ -14,14 +14,13 @@ export enum InspectionSamplingPointConditions {
 }
 
 export type RiceSubStandard = {
-  key?: string;
-  minLength?: number;
-  maxLength?: number;
+  key: string;
+  minLength: number;
+  maxLength: number;
   shape: string[];
-  name?: string;
-  conditionMin?: InspectionSamplingPointConditions;
-  conditionMax?: InspectionSamplingPointConditions;
-  value?: number;
+  name: string;
+  conditionMin: InspectionSamplingPointConditions;
+  conditionMax: InspectionSamplingPointConditions;
 };
 export type RiceStandard = {
   type: string;

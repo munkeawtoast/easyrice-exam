@@ -4,9 +4,11 @@ import {
   PutCommand,
   QueryCommand,
   GetCommand,
+  TransactWriteCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { BaseQueryInput } from './common.db';
+import { BaseQueryOptions } from './common.db';
+import { randomUUID } from 'crypto';
 
 export type RiceInspectionResultDatabasePk = Pick<RiceInspectionResult, 'type'>;
 export type RiceInspectionResultDatabaseGet = Pick<
@@ -14,11 +16,25 @@ export type RiceInspectionResultDatabaseGet = Pick<
   'id' | 'type'
 >;
 
+export type CreateRiceInspectionResultDatabasePk = Omit<
+  RiceInspectionResult,
+  'id'
+> & { id?: string };
+
+export type RiceInspectionResultQueryOptions = {
+  fromDate?: string;
+  toDate?: string;
+};
 export interface IDdbRiceInspectionResultDatabase {
   query: (
     query: RiceInspectionResultDatabasePk,
-    options: BaseQueryInput
+    options: RiceInspectionResultQueryOptions & BaseQueryOptions
   ) => Promise<RiceInspectionResult[]>;
+  get: (
+    query: RiceInspectionResultDatabaseGet
+  ) => Promise<RiceInspectionResult>;
+  create: (item: CreateRiceInspectionResultDatabasePk) => Promise<void>;
+  bulkDelete: (keys: RiceInspectionResultDatabaseGet[]) => Promise<void>;
 }
 
 export class RiceInspectionResultDatabase
@@ -29,34 +45,48 @@ export class RiceInspectionResultDatabase
   constructor() {
     this.dynamodbClient = DynamoDBDocumentClient.from(new DynamoDBClient(), {
       marshallOptions: {
-        convertEmptyValues: true,
         removeUndefinedValues: true,
       },
       unmarshallOptions: {},
     });
   }
+
   async query(
     query: RiceInspectionResultDatabasePk,
-    options: BaseQueryInput
+    options: BaseQueryOptions & RiceInspectionResultQueryOptions
   ): Promise<RiceInspectionResult[]> {
+    let condition = 'type = :type';
+
+    if (options.fromDate && options.toDate) {
+      condition += ' AND dateTime BETWEEN :fromDate AND :toDate';
+    } else if (options.fromDate) {
+      condition += ' AND dateTime >= :fromDate';
+    } else if (options.toDate) {
+      condition += ' AND dateTime <= :toDate';
+    }
     const command = new QueryCommand({
       TableName: this.ddbTable,
       Limit: options?.limit ?? 50,
       ExpressionAttributeValues: {
         ':type': query.type,
+        ':fromDate': options?.fromDate,
+        ':toDate': options?.toDate,
       },
-      KeyConditionExpression: 'type = :type',
+      KeyConditionExpression: condition,
     });
     const queryResult = await this.dynamodbClient.send(command);
     return queryResult.Items as RiceInspectionResult[];
   }
 
-  async create(item: RiceInspectionResult) {
+  async create(item: CreateRiceInspectionResultDatabasePk) {
     const command = new PutCommand({
       TableName: this.ddbTable,
-      Item: item,
+      Item: {
+        ...item,
+        id: randomUUID(),
+      },
     });
-    return this.dynamodbClient.send(command);
+    await this.dynamodbClient.send(command);
   }
 
   async get(query: RiceInspectionResultDatabaseGet) {
@@ -68,6 +98,21 @@ export class RiceInspectionResultDatabase
       },
     });
     const getResult = await this.dynamodbClient.send(command);
-    return getResult.Item;
+    return getResult.Item as RiceInspectionResult;
+  }
+
+  async bulkDelete(keys: RiceInspectionResultDatabaseGet[]) {
+    const command = new TransactWriteCommand({
+      TransactItems: keys.map((key) => ({
+        Delete: {
+          TableName: this.ddbTable,
+          Key: key,
+        },
+      })),
+    });
+    await this.dynamodbClient.send(command);
   }
 }
+
+export const ddbRiceInspectionResultDatabase =
+  new RiceInspectionResultDatabase();

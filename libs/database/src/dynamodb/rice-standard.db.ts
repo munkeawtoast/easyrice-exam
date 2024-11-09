@@ -1,7 +1,7 @@
 import { RiceStandard } from '@libs/models';
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { BaseQueryInput } from './common.db';
+import { BaseQueryOptions } from './common.db';
 
 export type RiceStandardDatabaseQueryArgs = Pick<RiceStandard, 'type'>;
 export type RiceStandardDatabaseGetArgs = Pick<RiceStandard, 'id' | 'type'>;
@@ -9,7 +9,7 @@ export type RiceStandardDatabaseGetArgs = Pick<RiceStandard, 'id' | 'type'>;
 export interface IDdbRiceStandardDatabase {
   query: (
     keys: RiceStandardDatabaseQueryArgs,
-    options: BaseQueryInput
+    options: BaseQueryOptions
   ) => Promise<RiceStandard[]>;
 }
 
@@ -27,7 +27,7 @@ export class RiceStandardDatabase implements IDdbRiceStandardDatabase {
   }
   async query(
     keys: RiceStandardDatabaseQueryArgs,
-    options: BaseQueryInput
+    options: BaseQueryOptions
   ): Promise<RiceStandard[]> {
     const command = new QueryCommand({
       TableName: this.ddbTable,
