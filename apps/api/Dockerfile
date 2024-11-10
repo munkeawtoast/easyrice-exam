@@ -9,4 +9,4 @@ EXPOSE 8080
 
 RUN pnpm i --frozen-lockfile
 
-CMD ["lambda.handler"]
+CMD ["main.lambdaHandler"]

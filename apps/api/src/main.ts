@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
+import { awsLambdaFastify } from '@fastify/aws-lambda';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -9,6 +10,7 @@ const server = Fastify({
   logger: true,
   ignoreTrailingSlash: true,
 });
+let lambdaHandler;
 
 // Register your application as a normal plugin.
 server.register(app);
@@ -22,6 +24,8 @@ if (require.main === module) {
       console.log(`[ ready ] http://${host}:${port}`);
     }
   });
+} else {
+  lambdaHandler = awsLambdaFastify(server);
 }
 
-export default server;
+export { lambdaHandler };
