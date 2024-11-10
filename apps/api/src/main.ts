@@ -13,12 +13,15 @@ const server = Fastify({
 // Register your application as a normal plugin.
 server.register(app);
 
-// Start listening.
-server.listen({ port, host }, (err) => {
-  if (err) {
-    server.log.error(err);
-    process.exit(1);
-  } else {
-    console.log(`[ ready ] http://${host}:${port}`);
-  }
-});
+if (require.main === module) {
+  server.listen({ port, host }, (err) => {
+    if (err) {
+      server.log.error(err);
+      process.exit(1);
+    } else {
+      console.log(`[ ready ] http://${host}:${port}`);
+    }
+  });
+}
+
+export default server;

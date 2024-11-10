@@ -17,6 +17,9 @@ dependencies:
   '@fastify/autoload':
     specifier: ^6.0.0
     version: 6.0.2
+  '@fastify/aws-lambda':
+    specifier: ^5.0.0
+    version: 5.0.0
   '@fastify/sensible':
     specifier: ^6.0.0
     version: 6.0.1
@@ -2698,6 +2701,10 @@ packages:
 
   /@fastify/autoload@6.0.2:
     resolution: {integrity: sha512-efRwk2KKTPERxHEnzabK+w2pGxBExCCYixPYUMqtLd++Xsoh4h5Rrq8D2xZDq2BQ8hTFI1rzGLkHWsz40wgoWA==}
+    dev: false
+
+  /@fastify/aws-lambda@5.0.0:
+    resolution: {integrity: sha512-yroOd+VkuNd+OsbcyT0NVgLWMsfsp1S2Uef7y5UomLMlrB5/vxi+BPwMz9hn0EZSHzNk2w4TFwMvu14iC6zX8g==}
     dev: false
 
   /@fastify/deepmerge@2.0.0:

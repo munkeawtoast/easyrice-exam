@@ -89,9 +89,9 @@ jobs:
       - name: Update Lambda Code
         run: |
           aws lambda update-function-code \
-            --function-name easyrice-${{ inputs.PROJECT_NAME }}-${{ inputs.STAGE }} \
+            --function-name ${{ inputs.PROJECT_NAME }}-${{ inputs.STAGE }} \
             --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.AWS_REGION }}.amazonaws.com/${{ inputs.ECR_REPOSITORY }}:${{ inputs.TAG }} \
             --region ${{ inputs.AWS_REGION }}
           aws lambda wait function-updated \
-            --function-name easyrice-${{ inputs.PROJECT_NAME }}-${{ inputs.STAGE }} \
+            --function-name ${{ inputs.PROJECT_NAME }}-${{ inputs.STAGE }} \
             --region ${{ inputs.AWS_REGION }}
