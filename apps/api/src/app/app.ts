@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import fp from './plugins/sensible';
 import historyRoute from './routes/history';
 import standardRoute from './routes/standard';
+import helloRoute from './routes/hello';
 
 import {
   serializerCompiler,
@@ -29,6 +30,7 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
 
   fastify.register(fp);
   fastify.register(historyRoute);
+  fastify.register(helloRoute);
   fastify.register(standardRoute);
 
   // This loads all plugins defined in routes
