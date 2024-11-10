@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   api:
-    uses: munkeawtoast/easyrice-exam/.github/workflows/deploy-to-ecr.yml@main
+    uses: munkeawtoast/easyrice-exam/.github/workflows/deploy-to-lambda.yml@main
     name: Deploy
     with:
       PROJECT_NAME: api
