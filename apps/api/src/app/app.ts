@@ -1,6 +1,8 @@
-import * as path from 'path';
 import { FastifyInstance } from 'fastify';
-import AutoLoad from '@fastify/autoload';
+import fp from './plugins/sensible';
+import historyRoute from './routes/history';
+import standardRoute from './routes/standard';
+
 import {
   serializerCompiler,
   validatorCompiler,
@@ -20,15 +22,19 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
 
   fastify.setValidatorCompiler(validatorCompiler);
   fastify.setSerializerCompiler(serializerCompiler);
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, 'plugins'),
-    options: { ...opts },
-  });
+  // fastify.register(AutoLoad, {
+  //   dir: path.join(__dirname, 'plugins'),
+  //   options: { ...opts },
+  // });
+
+  fastify.register(fp);
+  fastify.register(historyRoute);
+  fastify.register(standardRoute);
 
   // This loads all plugins defined in routes
   // define your routes in one of these
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, 'routes'),
-    options: { ...opts },
-  });
+  // fastify.register(AutoLoad, {
+  //   dir: path.join(__dirname, 'routes'),
+  //   options: { ...opts },
+  // });
 }
