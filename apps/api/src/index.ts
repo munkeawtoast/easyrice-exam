@@ -10,7 +10,7 @@ const server = Fastify({
   logger: true,
   ignoreTrailingSlash: true,
 });
-let lambdaHandler;
+let handler;
 
 // Register your application as a normal plugin.
 server.register(app);
@@ -25,7 +25,7 @@ if (require.main === module) {
     }
   });
 } else {
-  lambdaHandler = awsLambdaFastify(server);
+  handler = awsLambdaFastify(server);
 }
 
-export { lambdaHandler };
+export { handler };
