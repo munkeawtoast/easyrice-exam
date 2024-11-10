@@ -1,4 +1,4 @@
-name: 🔄 Build and deploy serverless apps
+name: 🔄 Build and deploy serverless as code to Lambda
 env:
   STAGE: ${{ inputs.STAGE }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +78,8 @@ jobs:
       - name: Zip function
         run: |
           root_dir=$(npx nx show project ${{ inputs.PROJECT_NAME }} --json | jq -r .root)
-          (cd dist/$root_dir && zip function.zip *)
+          (cd dist/$root_dir && zip -r function.zip .)
+          zip -ur dist/$root_dir/function.zip node_modules
       - name: Update Lambda Code
         run: |
           root_dir=$(npx nx show project ${{ inputs.PROJECT_NAME }} --json | jq -r .root)

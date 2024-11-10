@@ -1,4 +1,4 @@
-name: 🔄 Build and deploy serverless apps
+name: 🔄 Build and deploy serverless to ECR to Lambda
 env:
   STAGE: ${{ inputs.STAGE }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
