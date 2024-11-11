@@ -12,14 +12,14 @@
       "options": {
         "platform": "node",
         "outputPath": "dist/apps/api",
-        "format": ["cjs"],
+        "format": ["esm"],
         "bundle": true,
         "main": "apps/api/src/index.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
         "assets": ["apps/api/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
-          "sourcemap": true,
+          "sourcemap": false,
           "outExtension": {
             ".js": ".js"
           }

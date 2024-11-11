@@ -4,6 +4,7 @@ import { awsLambdaFastify } from '@fastify/aws-lambda';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const isLambda = !!process.env.LAMBDA_TASK_ROOT;
 
 // Instantiate Fastify with some config
 const server = Fastify({
@@ -15,7 +16,7 @@ let handler;
 // Register your application as a normal plugin.
 server.register(app);
 
-if (require.main === module) {
+if (!isLambda) {
   server.listen({ port, host }, (err) => {
     if (err) {
       server.log.error(err);
