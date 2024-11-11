@@ -29,6 +29,26 @@ export const FullHistoryDtoSchema = HistoryDtoSchema.merge(
   })
 );
 
+export const CreateHistoryRequestBodySchema = FullHistoryDtoSchema.omit({
+  inspectionID: true,
+});
+export type CreateHistoryRequestBody = z.infer<
+  typeof CreateHistoryRequestBodySchema
+>;
+
+export const PutHistoryRequestBodySchema = HistoryDtoSchema.pick({
+  note: true,
+  price: true,
+  samplingPoint: true,
+  samplingDate: true,
+});
+export type PutHistoryRequestBody = z.infer<typeof PutHistoryRequestBodySchema>;
+
+export const PutHistoryParamsSchema = z.object({
+  inspectionID: z.string(),
+});
+export type PutHistoryParams = z.infer<typeof PutHistoryParamsSchema>;
+
 export type FullHistoryDto = z.infer<typeof FullHistoryDtoSchema>;
 
 export const GetHistoryResponseSchema = FullHistoryDtoSchema;
@@ -61,8 +81,18 @@ export const ListHistoryApiSchema = {
 
 export type HistoryListResponseDto = z.infer<typeof ListHistoryResponseSchema>;
 
+export const PutHistoryApiSchema = {
+  body: PutHistoryRequestBodySchema,
+  params: PutHistoryParamsSchema,
+  response: {
+    201: FullHistoryDtoSchema,
+  },
+} satisfies ApiSchema;
+
 export const CreateHistoryApiSchema = {
-  body: FullHistoryDtoSchema,
+  body: FullHistoryDtoSchema.omit({
+    inspectionID: true,
+  }),
   response: {
     201: FullHistoryDtoSchema,
   },
@@ -75,4 +105,4 @@ export const DeleteHistoryApiSchema = {
   response: {
     200: z.string(),
   },
-};
+} satisfies ApiSchema;

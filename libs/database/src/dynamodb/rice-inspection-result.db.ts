@@ -5,10 +5,12 @@ import {
   QueryCommand,
   GetCommand,
   TransactWriteCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { BaseQueryOptions } from './common.db';
 import { randomUUID } from 'crypto';
+import { Prettify } from 'ts-essentials';
 
 export type RiceInspectionResultDatabasePk = Pick<RiceInspectionResult, 'type'>;
 export type RiceInspectionResultDatabaseGet = Pick<
@@ -34,6 +36,10 @@ export interface IDdbRiceInspectionResultDatabase {
     query: RiceInspectionResultDatabaseGet
   ) => Promise<RiceInspectionResult>;
   create: (item: CreateRiceInspectionResultDatabasePk) => Promise<void>;
+  update: (
+    key: RiceInspectionResultDatabaseGet,
+    item: Prettify<Partial<Omit<RiceInspectionResult, 'id' | 'type'>>>
+  ) => Promise<RiceInspectionResult>;
   bulkDelete: (keys: RiceInspectionResultDatabaseGet[]) => Promise<void>;
 }
 
@@ -49,6 +55,20 @@ export class RiceInspectionResultDatabase
       },
       unmarshallOptions: {},
     });
+  }
+
+  private createUpdateExpressions(item: { [key: string]: any }) {
+    const updateExpression: string[] = [];
+    const expressionAttribute: { [key: string]: any } = {};
+    const expressionAttributeNames: { [key: string]: any } = {};
+    Object.keys(item).map((key) => {
+      const placeholder = `:${key}`;
+      const alias = `#${key}`;
+      updateExpression.push(`${alias} = ${placeholder}`);
+      expressionAttribute[placeholder] = item[key];
+      expressionAttributeNames[alias] = key;
+    });
+    return { updateExpression, expressionAttribute, expressionAttributeNames };
   }
 
   async query(
@@ -76,6 +96,24 @@ export class RiceInspectionResultDatabase
     });
     const queryResult = await this.dynamodbClient.send(command);
     return queryResult.Items as RiceInspectionResult[];
+  }
+
+  async update(
+    key: RiceInspectionResultDatabaseGet,
+    item: Prettify<Partial<Omit<RiceInspectionResult, 'id' | 'type'>>>
+  ) {
+    const { updateExpression, expressionAttribute, expressionAttributeNames } =
+      this.createUpdateExpressions(item);
+    const command = new UpdateCommand({
+      TableName: this.ddbTable,
+      Key: key,
+      UpdateExpression: `SET ${updateExpression.join(', ')}`,
+      ExpressionAttributeValues: expressionAttribute,
+      ExpressionAttributeNames: expressionAttributeNames,
+      ReturnValues: 'ALL_NEW',
+    });
+    const response = await this.dynamodbClient.send(command);
+    return response.Attributes as RiceInspectionResult;
   }
 
   async create(item: CreateRiceInspectionResultDatabasePk) {
