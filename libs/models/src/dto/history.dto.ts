@@ -26,6 +26,12 @@ export const FullHistoryDtoSchema = HistoryDtoSchema.merge(
   z.object({
     imageLink: z.string().url(),
     standardData: z.array(HistorySubStandardSchemaDto),
+    riceTypePercentage: z
+      .object({
+        name: z.string(),
+        value: z.number(),
+      })
+      .array(),
   })
 );
 
@@ -70,9 +76,9 @@ export type ListHistoryResopnseDto = z.infer<typeof ListHistoryResponseSchema>;
 
 export const ListHistoryApiSchema = {
   querystring: z.object({
-    fromDate: z.string().datetime(),
-    toDate: z.string().datetime(),
-    inspectionID: z.string(),
+    fromDate: z.string().datetime().optional(),
+    toDate: z.string().datetime().optional(),
+    inspectionID: z.string().optional(),
   }),
   response: {
     200: ListHistoryResponseSchema,

@@ -11,8 +11,8 @@ export default async function (fastify: FastifyInstance) {
         method: 'GET',
         url: '/',
         schema: ListStandardApiSchema,
-        handler: (request, reply) => {
-          const result = standardService.queryRiceInspectionResult();
+        handler: async (request, reply) => {
+          const result = await standardService.queryRiceInspectionResult();
           return reply.code(200).send(result);
         },
       });

@@ -1,11 +1,12 @@
 import {
   BaseQueryOptions,
   IDdbRiceStandardDatabase,
+  RiceStandardDatabase,
   RiceStandardQueryOptions,
-  ddbRiceStandardDatabase,
 } from '@libs/database';
 import { StandardDto } from '@libs/dto/standard.dto';
 import { RiceStandard } from '@libs/models';
+import { appConfig } from '../../config/app-config';
 
 export type RiceInspectionResultKey = {
   id: string;
@@ -13,16 +14,15 @@ export type RiceInspectionResultKey = {
 
 export class StandardService {
   private baseRiceKey = 'whiterice';
-  constructor(
-    private riceStandardDatabase: IDdbRiceStandardDatabase = ddbRiceStandardDatabase
-  ) {}
+  private riceStandardDatabase: IDdbRiceStandardDatabase =
+    new RiceStandardDatabase(appConfig().DDB_CLIENT);
+  constructor() {}
 
   private transformToStandardDto(record: RiceStandard): StandardDto {
     return {
-      name: record.name,
       id: record.id,
       createDate: record.createDate,
-      standardName: record.standardName,
+      standardName: record.name,
       standardData: record.standardData,
     };
   }

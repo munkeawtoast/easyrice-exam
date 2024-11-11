@@ -1,10 +1,20 @@
 import {
+  CreateRiceInspectionResultDatabasePk,
   IDdbRiceInspectionResultDatabase,
+  RiceInspectionResultDatabase,
+  RiceInspectionResultDatabaseGet,
   RiceInspectionResultQueryOptions,
-  ddbRiceInspectionResultDatabase,
 } from '@libs/database';
-import { FullHistoryDto, HistoryDto } from '@libs/dto/history.dto';
+import {
+  CreateHistoryRequestBody,
+  FullHistoryDto,
+  HistoryDto,
+  PutHistoryParams,
+  PutHistoryRequestBody,
+} from '@libs/dto/history.dto';
 import { RiceInspectionResult } from '@libs/models';
+import { randomUUID } from 'crypto';
+import { appConfig } from '../../config/app-config';
 
 export type RiceInspectionResultKey = {
   id: string;
@@ -12,11 +22,11 @@ export type RiceInspectionResultKey = {
 
 export class RiceInspectorService {
   private baseRiceKey = 'whiterice';
-  constructor(
-    private riceInspectionResultDatabase: IDdbRiceInspectionResultDatabase = ddbRiceInspectionResultDatabase
-  ) {}
+  private riceInspectionResultDatabase: IDdbRiceInspectionResultDatabase =
+    new RiceInspectionResultDatabase(appConfig().DDB_CLIENT);
+  constructor() {}
 
-  private transformToHistoryDto(record: RiceInspectionResult) {
+  private transformToHistoryDto(record: RiceInspectionResult): HistoryDto {
     return {
       name: record.name,
       createDate: record.createDate,
@@ -29,7 +39,9 @@ export class RiceInspectorService {
     };
   }
 
-  private transformToFullHistoryDto(record: RiceInspectionResult) {
+  private transformToFullHistoryDto(
+    record: RiceInspectionResult
+  ): FullHistoryDto {
     return {
       name: record.name,
       createDate: record.createDate,
@@ -41,6 +53,7 @@ export class RiceInspectorService {
       samplingPoint: record.samplingPoint,
       imageLink: record.imageLink,
       standardData: record.standardData,
+      riceTypePercentage: record.riceTypePercentage,
     };
   }
 
@@ -69,11 +82,32 @@ export class RiceInspectorService {
     return records.map(this.transformToHistoryDto);
   }
 
-  async createRiceInspectionResult(item: FullHistoryDto) {
-    return this.riceInspectionResultDatabase.create({
+  async putRiceInspectionResult(
+    item: PutHistoryParams & PutHistoryRequestBody
+  ): Promise<FullHistoryDto> {
+    const creatingItem: PutHistoryRequestBody = {
+      note: item.note,
+      samplingDate: item.samplingDate,
+      samplingPoint: item.samplingPoint,
+    };
+    const key: RiceInspectionResultDatabaseGet = {
+      id: item.inspectionID,
+      type: this.baseRiceKey,
+    };
+    const record = await this.riceInspectionResultDatabase.update(
+      key,
+      creatingItem
+    );
+    return this.transformToFullHistoryDto(record);
+  }
+
+  async createRiceInspectionResult(
+    item: CreateHistoryRequestBody
+  ): Promise<FullHistoryDto> {
+    const creatingItem = {
       name: item.name ?? '',
       createDate: item.createDate,
-      id: item.inspectionID,
+      id: randomUUID(),
       standardID: item.standardID,
       note: item.note,
       standardName: item.standardName,
@@ -81,11 +115,16 @@ export class RiceInspectorService {
       samplingPoint: item.samplingPoint,
       imageLink: item.imageLink,
       standardData: item.standardData,
+      price: item.price,
       type: this.baseRiceKey,
-    });
+      riceTypePercentage: item.riceTypePercentage,
+    } satisfies CreateRiceInspectionResultDatabasePk;
+
+    await this.riceInspectionResultDatabase.create(creatingItem);
+    return this.transformToFullHistoryDto(creatingItem);
   }
 
-  async deleteRiceInspectionResult(ids: string[]) {
+  async deleteRiceInspectionResult(ids: string[]): Promise<void> {
     return this.riceInspectionResultDatabase.bulkDelete(
       ids.map((id) => ({ id, type: this.baseRiceKey }))
     );

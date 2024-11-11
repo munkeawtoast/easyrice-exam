@@ -1,8 +1,11 @@
+import { Prettify } from 'ts-essentials';
 import { RiceSubStandard } from './standard';
 
-export type RiceInspectionSubStandard = RiceSubStandard & {
-  value: number;
-};
+export type RiceInspectionSubStandard = Prettify<
+  RiceSubStandard & {
+    value: number;
+  }
+>;
 
 export type RiceInspectionResult = {
   type: string;
@@ -17,4 +20,8 @@ export type RiceInspectionResult = {
   price?: number;
   imageLink: string;
   standardData: RiceInspectionSubStandard[];
+  riceTypePercentage: {
+    name: string;
+    value: number;
+  }[];
 };

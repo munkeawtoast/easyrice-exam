@@ -1,10 +1,11 @@
 import {
+  CreateHistoryApiSchema,
+  DeleteHistoryApiSchema,
   GetHistoryApiSchema,
-  GetHistoryResponseSchema,
   ListHistoryApiSchema,
   ListHistoryResopnseDto,
+  PutHistoryApiSchema,
 } from '@libs/dto/history.dto';
-import { z } from 'zod';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import type { FastifyInstance } from 'fastify';
 import { RiceInspectorService } from '../services/rice-inspector';
@@ -29,14 +30,6 @@ export default async function (fastify: FastifyInstance) {
               } = await riceInspectorService.getRiceInspectionResult({
                 id: request.query.inspectionID,
               });
-              if (
-                !record.createDate ||
-                record.createDate < request.query.fromDate ||
-                record.createDate > request.query.toDate
-              ) {
-              } else {
-                result.push(record);
-              }
             } else {
               const records =
                 await riceInspectorService.queryRiceInspectionResult({
@@ -64,29 +57,34 @@ export default async function (fastify: FastifyInstance) {
         route.route({
           method: 'POST',
           url: '/',
-          schema: {
-            body: GetHistoryResponseSchema,
-            response: {
-              200: GetHistoryResponseSchema,
-            },
-          },
+          schema: CreateHistoryApiSchema,
           handler: async (request, reply) => {
-            await riceInspectorService.createRiceInspectionResult(request.body);
-            return reply.code(201).send(request.body);
+            const history =
+              await riceInspectorService.createRiceInspectionResult(
+                request.body
+              );
+            return reply.code(201).send(history);
+          },
+        });
+
+        route.route({
+          method: 'PUT',
+          url: '/',
+          schema: PutHistoryApiSchema,
+          handler: async (request, reply) => {
+            const newHistory =
+              await riceInspectorService.putRiceInspectionResult({
+                ...request.body,
+                ...request.params,
+              });
+            return reply.code(200).send(newHistory);
           },
         });
 
         route.route({
           method: 'DELETE',
           url: '/',
-          schema: {
-            body: z.object({
-              inspectionID: z.array(z.string()),
-            }),
-            response: {
-              200: z.string(),
-            },
-          },
+          schema: DeleteHistoryApiSchema,
           handler: async (request, reply) => {
             await riceInspectorService.deleteRiceInspectionResult(
               request.body.inspectionID

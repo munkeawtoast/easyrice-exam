@@ -27,6 +27,5 @@ export type RiceStandard = {
   id: string;
   name: string;
   createDate: string;
-  standardName: string;
   standardData: RiceSubStandard[];
 };

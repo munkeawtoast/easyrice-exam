@@ -13,7 +13,15 @@ const isLambda = !!process.env.LAMBDA_TASK_ROOT;
 
 // Instantiate Fastify with some config
 const server = Fastify({
-  logger: true,
+  logger: {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        translateTime: 'HH:MM:ss Z',
+        ignore: 'pid,hostname',
+      },
+    },
+  },
   ignoreTrailingSlash: true,
 });
 let handler;

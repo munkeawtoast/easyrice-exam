@@ -13,7 +13,6 @@ export const SubStandardSchemaDto = z.object({
 });
 
 export const StandardSchemaDto = z.object({
-  name: z.string(),
   id: z.string(),
   createDate: z.string().datetime().optional(),
   standardName: z.string(),

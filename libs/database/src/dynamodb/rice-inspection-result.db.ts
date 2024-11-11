@@ -7,7 +7,6 @@ import {
   TransactWriteCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { BaseQueryOptions } from './common.db';
 import { randomUUID } from 'crypto';
 import { Prettify } from 'ts-essentials';
@@ -47,15 +46,7 @@ export class RiceInspectionResultDatabase
   implements IDdbRiceInspectionResultDatabase
 {
   private ddbTable = 'easyrice-inspection_result';
-  private dynamodbClient: DynamoDBDocumentClient;
-  constructor() {
-    this.dynamodbClient = DynamoDBDocumentClient.from(new DynamoDBClient(), {
-      marshallOptions: {
-        removeUndefinedValues: true,
-      },
-      unmarshallOptions: {},
-    });
-  }
+  constructor(private dynamodbClient: DynamoDBDocumentClient) {}
 
   private createUpdateExpressions(item: { [key: string]: any }) {
     const updateExpression: string[] = [];
@@ -75,7 +66,7 @@ export class RiceInspectionResultDatabase
     query: RiceInspectionResultDatabasePk,
     options: BaseQueryOptions & RiceInspectionResultQueryOptions
   ): Promise<RiceInspectionResult[]> {
-    let condition = 'type = :type';
+    let condition = '#type = :type';
 
     if (options.fromDate && options.toDate) {
       condition += ' AND dateTime BETWEEN :fromDate AND :toDate';
@@ -91,6 +82,9 @@ export class RiceInspectionResultDatabase
         ':type': query.type,
         ':fromDate': options?.fromDate,
         ':toDate': options?.toDate,
+      },
+      ExpressionAttributeNames: {
+        '#type': 'type',
       },
       KeyConditionExpression: condition,
     });
@@ -151,6 +145,3 @@ export class RiceInspectionResultDatabase
     await this.dynamodbClient.send(command);
   }
 }
-
-export const ddbRiceInspectionResultDatabase =
-  new RiceInspectionResultDatabase();
