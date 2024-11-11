@@ -58,6 +58,7 @@ export type PutHistoryParams = z.infer<typeof PutHistoryParamsSchema>;
 export type FullHistoryDto = z.infer<typeof FullHistoryDtoSchema>;
 
 export const GetHistoryResponseSchema = FullHistoryDtoSchema;
+export type GetHistoryResponseDto = z.infer<typeof GetHistoryResponseSchema>;
 
 export const GetHistoryApiSchema = {
   params: z.object({
@@ -67,6 +68,7 @@ export const GetHistoryApiSchema = {
     200: GetHistoryResponseSchema,
   },
 } satisfies ApiSchema;
+export type GetHistoryApi = typeof GetHistoryApiSchema;
 
 export const ListHistoryResponseSchema = z.object({
   data: z.array(HistoryDtoSchema),
@@ -96,9 +98,7 @@ export const PutHistoryApiSchema = {
 } satisfies ApiSchema;
 
 export const CreateHistoryApiSchema = {
-  body: FullHistoryDtoSchema.omit({
-    inspectionID: true,
-  }),
+  body: CreateHistoryRequestBodySchema,
   response: {
     201: FullHistoryDtoSchema,
   },
