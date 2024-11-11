@@ -3,6 +3,7 @@ import fp from './plugins/sensible';
 import historyRoute from './routes/history';
 import standardRoute from './routes/standard';
 import helloRoute from './routes/hello';
+import { PromiseHandler } from '@fastify/aws-lambda';
 
 import {
   serializerCompiler,
@@ -32,6 +33,13 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
   fastify.register(historyRoute);
   fastify.register(helloRoute);
   fastify.register(standardRoute);
+  fastify.setErrorHandler(function (error, request, reply) {
+    // Log error
+    this.log.error(error);
+    this.log.error(request);
+    // Send error response
+    reply.status(409).send({ ok: false });
+  });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
