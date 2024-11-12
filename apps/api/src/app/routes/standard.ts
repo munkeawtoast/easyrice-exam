@@ -1,4 +1,4 @@
-import { ListStandardApiSchema } from '@libs/dto/standard.dto';
+import { ListStandardApiSchema } from '@libs/dto/standard';
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { StandardService } from '../services/standard';

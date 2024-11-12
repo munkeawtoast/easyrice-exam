@@ -78,6 +78,7 @@ export class RestApiClient {
     config: ApiClientConfig<QueryParams, Body, UrlParams>,
     schema: ApiSchema<QueryParams, Body, UrlParams> = {}
   ) {
+    console.log('asdfaodfj');
     return this.client.request<ResDto>(config);
   }
 }

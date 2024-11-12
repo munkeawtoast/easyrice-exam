@@ -1,21 +1,25 @@
 import { z } from 'zod';
-import { SubStandardSchemaDto } from './standard.dto';
+import { SubStandardSchemaDto } from './standard';
 import { ApiSchema } from '@libs/rest';
+import { RiceRawAnalysisSchema } from '../raw-inspection';
 
 export const HistorySubStandardSchemaDto = SubStandardSchemaDto.merge(
   z.object({
     value: z.number(),
   })
 );
+export type HistorySubStandardData = z.infer<
+  typeof HistorySubStandardSchemaDto
+>;
 
 export const HistoryDtoSchema = z.object({
-  name: z.string().optional(),
-  createDate: z.string().optional(),
+  name: z.string(),
+  createDate: z.string().datetime().optional(),
   inspectionID: z.string(),
   standardID: z.string(),
   note: z.string().optional(),
   standardName: z.string(),
-  samplingDate: z.string().datetime(),
+  samplingDate: z.string().datetime().optional(),
   samplingPoint: z.array(z.string()),
   price: z.number().optional(),
 });
@@ -37,7 +41,16 @@ export const FullHistoryDtoSchema = HistoryDtoSchema.merge(
 
 export const CreateHistoryRequestBodySchema = FullHistoryDtoSchema.omit({
   inspectionID: true,
-});
+  imageLink: true,
+  standardData: true,
+  riceTypePercentage: true,
+}).merge(
+  z.object({
+    samplingPoint: z.array(z.string()),
+    standardData: z.array(SubStandardSchemaDto),
+    rawData: RiceRawAnalysisSchema.optional(),
+  })
+);
 export type CreateHistoryRequestBody = z.infer<
   typeof CreateHistoryRequestBodySchema
 >;
@@ -84,6 +97,7 @@ export const ListHistoryApiSchema = {
   }),
   response: {
     200: ListHistoryResponseSchema,
+    500: z.string(),
   },
 } satisfies ApiSchema;
 

@@ -1,14 +1,17 @@
 import {
   CreateHistoryApiSchema,
   DeleteHistoryApiSchema,
+  FullHistoryDtoSchema,
+  FullHistoryDto,
   GetHistoryApiSchema,
   ListHistoryApiSchema,
   ListHistoryResopnseDto,
   PutHistoryApiSchema,
-} from '@libs/dto/history.dto';
+} from '@libs/dto/history';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import type { FastifyInstance } from 'fastify';
 import { RiceInspectorService } from '../services/rice-inspector';
+import { RiceRawAnalysis, RiceRawAnalysisSchema } from '@libs/models';
 
 export default async function (fastify: FastifyInstance) {
   const riceInspectorService = new RiceInspectorService();
@@ -23,20 +26,28 @@ export default async function (fastify: FastifyInstance) {
           handler: async (request, reply) => {
             const result: ListHistoryResopnseDto['data'] = [];
             if (request.query.inspectionID) {
-              const {
-                standardData: _,
-                imageLink: __,
-                ...record
-              } = await riceInspectorService.getRiceInspectionResult({
-                id: request.query.inspectionID,
-              });
-            } else {
-              const records =
-                await riceInspectorService.queryRiceInspectionResult({
-                  fromDate: request.query.fromDate,
-                  toDate: request.query.toDate,
+              try {
+                const {
+                  standardData: _,
+                  imageLink: __,
+                  ...record
+                } = await riceInspectorService.getRiceInspectionResult({
+                  id: request.query.inspectionID,
                 });
-              result.push(...records);
+                result.push(record);
+              } catch (e) {}
+            } else {
+              try {
+                const records =
+                  await riceInspectorService.queryRiceInspectionResult({
+                    fromDate: request.query.fromDate,
+                    toDate: request.query.toDate,
+                  });
+                result.push(...records);
+              } catch (e) {
+                console.error(e);
+                return reply.code(500).send('Internal Server Error');
+              }
             }
             return reply.code(200).send({ data: result });
           },
@@ -63,7 +74,7 @@ export default async function (fastify: FastifyInstance) {
               await riceInspectorService.createRiceInspectionResult(
                 request.body
               );
-            return reply.code(201).send(history);
+            return reply.code(201).send(history as FullHistoryDto);
           },
         });
 

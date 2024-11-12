@@ -1,15 +1,3 @@
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { format } from 'date-fns';
@@ -28,6 +16,7 @@ import {
   TableBody,
   TableHead,
   TableRow,
+  TableCell,
 } from '@libs/ui/table';
 import { Card } from '@libs/ui/card';
 import { Button } from '@libs/ui/button';
@@ -35,32 +24,74 @@ import { Calendar } from '@libs/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@libs/ui/popover';
 import z from 'zod';
 import { cn } from '@libs/ui/utils';
-import { CalendarIcon, Search } from 'lucide-react';
+import { CalendarIcon, Search, TrashIcon } from 'lucide-react';
+import ContentPadding from '../../components/content-padding';
+import HistoryApi from '../../api/history.api';
+import { useEffect, useState } from 'react';
+import { HistoryDto } from '@libs/dto/history';
+import { Checkbox } from '@libs/ui/checkbox';
+import { CheckedState } from '@radix-ui/react-checkbox';
+import { Link } from 'react-router-dom';
 type Props = {};
 
 const formSchema = z.object({
-  id: z.string(),
-  fromDate: z.date(),
-  toDate: z.date(),
+  id: z.string().optional(),
+  fromDate: z.date().optional(),
+  toDate: z.date().optional(),
 });
 
 const HistoryListingPage = (props: Props) => {
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {},
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const [history, setHistory] = useState<HistoryDto[]>([]);
+
+  async function fetchHistory(
+    fromDate?: string,
+    toDate?: string,
+    inspectionID?: string
+  ) {
+    const fetchHistory = await HistoryApi.listHistory(
+      fromDate,
+      toDate,
+      inspectionID
+    );
+    setHistory(fetchHistory.data);
   }
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+    fetchHistory(
+      values.fromDate?.toISOString(),
+      values.toDate?.toISOString(),
+      values.id
+    );
+  }
+
+  const handleCheckboxChange = (checked: CheckedState, item: string) => {
+    setSelectedRows((prev) =>
+      checked
+        ? [...prev, item]
+        : prev.filter((selectedItem) => selectedItem !== item)
+    );
+  };
+
+  const handleDeleteButton = async () => {
+    await HistoryApi.deleteHistory(selectedRows);
+    await fetchHistory();
+  };
 
   function resetForm() {
     form.reset();
   }
+  useEffect(() => {
+    fetchHistory();
+  }, []);
   return (
-    <>
+    <ContentPadding>
       <Form {...form}>
         <Card className="p-6">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -182,29 +213,58 @@ const HistoryListingPage = (props: Props) => {
           </form>
         </Card>
       </Form>
-      {/* <div className="rounded-md border">
+
+      <div className="my-6">
+        <Button
+          variant="outline"
+          className="border-primary text-primary hover:text-destructive-foreground hover:bg-destructive hover:border-destructive"
+          onClick={handleDeleteButton}
+        >
+          <TrashIcon className="ml-auto h-4 w-4" /> Delete
+        </Button>
+      </div>
+      <div className="mt-6 rounded-md border">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+          <TableHeader className="bg-primary ">
+            <TableHead className="text-primary-foreground"></TableHead>
+            <TableHead className="text-primary-foreground">
+              Create Date - Time
+            </TableHead>
+            <TableHead className="text-primary-foreground">
+              Inspection ID
+            </TableHead>
+            <TableHead className="text-primary-foreground">Name</TableHead>
+            <TableHead className="text-primary-foreground">Standard</TableHead>
+            <TableHead className="text-primary-foreground">Note</TableHead>
+          </TableHeader>
+          <TableBody>
+            {history.map((his) => (
+              <TableRow key={his.inspectionID}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedRows.includes(his.inspectionID)}
+                    onCheckedChange={(checked: CheckedState) =>
+                      handleCheckboxChange(checked, his.inspectionID)
+                    }
+                  />
+                </TableCell>
+                <Link to={`/history/${his.inspectionID}`} className="contents">
+                  <TableCell>
+                    {his.createDate
+                      ? format(his.createDate, 'dd/MM/yyyy - HH:mm:ss')
+                      : 'No date'}
+                  </TableCell>
+                  <TableCell>{his.inspectionID}</TableCell>
+                  <TableCell>{his.name}</TableCell>
+                  <TableCell>{his.standardName}</TableCell>
+                  <TableCell>{his.note}</TableCell>
+                </Link>
               </TableRow>
             ))}
-          </TableHeader>
+          </TableBody>
         </Table>
-      </div> */}
-    </>
+      </div>
+    </ContentPadding>
   );
 };
 

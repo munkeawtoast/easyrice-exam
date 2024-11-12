@@ -4,7 +4,7 @@ import {
   RiceStandardDatabase,
   RiceStandardQueryOptions,
 } from '@libs/database';
-import { StandardDto } from '@libs/dto/standard.dto';
+import { StandardDto } from '@libs/dto/standard';
 import { RiceStandard } from '@libs/models';
 import { appConfig } from '../../config/app-config';
 

@@ -6,13 +6,13 @@ import {
   GetHistoryResponseDto,
   ListHistoryApiSchema,
   ListHistoryResopnseDto,
-  CreateHistoryApiSchema,
   DeleteHistoryApiSchema,
   PutHistoryApiSchema,
   CreateHistoryRequestBody,
   PutHistoryRequestBody,
   PutHistoryParams,
-} from '@libs/dto/history.dto';
+  CreateHistoryApiSchema,
+} from '@libs/dto/history';
 
 const apiClient = new RestApiClient(axiosClient);
 const HistoryApi = {

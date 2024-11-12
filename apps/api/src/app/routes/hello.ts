@@ -13,6 +13,16 @@ export default async function (fastify: FastifyInstance) {
           });
         },
       });
+      instance.route({
+        method: 'POST',
+        url: '/',
+        handler: (request, reply) => {
+          request.log.info('Request body:', request.body);
+          return reply.code(200).send({
+            body: request.body,
+          });
+        },
+      });
     },
     { prefix: '/hello' }
   );

@@ -11,6 +11,7 @@ export const SubStandardSchemaDto = z.object({
   conditionMin: z.nativeEnum(InspectionSamplingPointConditions),
   conditionMax: z.nativeEnum(InspectionSamplingPointConditions),
 });
+export type SubStandardData = z.infer<typeof SubStandardSchemaDto>;
 
 export const StandardSchemaDto = z.object({
   id: z.string(),
@@ -22,6 +23,9 @@ export const StandardSchemaDto = z.object({
 export type StandardDto = z.infer<typeof StandardSchemaDto>;
 
 export const ListStandardResponseSchema = z.array(StandardSchemaDto);
+export type ListStandardResponseDto = z.infer<
+  typeof ListStandardResponseSchema
+>;
 
 export const ListStandardApiSchema = {
   response: {

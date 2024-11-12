@@ -15,7 +15,7 @@ export type RiceInspectionResult = {
   standardID: string;
   note?: string;
   standardName: string;
-  samplingDate: string;
+  samplingDate?: string;
   samplingPoint: string[];
   price?: number;
   imageLink: string;

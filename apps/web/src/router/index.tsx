@@ -1,6 +1,7 @@
 import { Link, createBrowserRouter } from 'react-router-dom';
 import InspectionFormPage from '../pages/inspection-form';
 import HistoryListingPage from '../pages/history-listing';
+import ResultSingle from '../pages/result-single';
 
 const router = createBrowserRouter([
   {
@@ -10,6 +11,10 @@ const router = createBrowserRouter([
   {
     path: '/history',
     element: <HistoryListingPage />,
+  },
+  {
+    path: '/history/:id',
+    element: <ResultSingle />,
   },
 ]);
 

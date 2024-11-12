@@ -1,11 +1,7 @@
 import Fastify from 'fastify';
 import { app } from './app/app';
 import { awsLambdaFastify } from '@fastify/aws-lambda';
-import {
-  APIGatewayEventRequestContext,
-  APIGatewayProxyEvent,
-  Context,
-} from 'aws-lambda';
+import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;

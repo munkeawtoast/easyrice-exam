@@ -1,0 +1,83 @@
+@baseUrl = http://localhost:3000
+
+### hello
+GET {{baseUrl}}/hello HTTP/1.1
+
+### get-history
+@id = 1
+GET {{baseUrl}}/history/{{id}}
+### list-history
+@fromDate = 2024-11-11T00:00:00.000Z
+@toDate = 2024-11-11T00:00:00.000Z
+
+GET {{baseUrl}}/history
+  ?fromDate={{fromDate}}
+  &toDate={{toDate}}
+
+### create-history
+@name = test
+@standardID = 1
+@note = testnotetest
+@standardName = teststandard
+@samplingDate = 2024-11-11T00:00:00.000Z
+@samplingPointItem1 = 'frontend
+@price = 1000
+
+POST {{baseUrl}}/history
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+{{name}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="standardID"
+
+{{standardID}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="note"
+
+{{note}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="standardName"
+
+{{standardName}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="samplingDate"
+
+{{samplingDate}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="samplingPoint"
+
+onetwo
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="samplingPoint"
+
+threefour
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price"
+
+{{price}}
+
+### list-standard
+GET {{baseUrl}}/standard
+
+### test-hello
+POST {{baseUrl}}/hello
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW;
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+{{name}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="hello"
+Content-Type: application/json
+
+< ./tsconfig.app.json
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="testttt"
+Content-Type: text/plain
+
+< ./Dockerfile
+------WebKitFormBoundary7MA4YWxkTrZu0gW

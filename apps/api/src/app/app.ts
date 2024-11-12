@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify';
+import cors from '@fastify/cors';
+import { fastifyMultipart } from '@fastify/multipart';
 import fp from './plugins/sensible';
 import historyRoute from './routes/history';
 import standardRoute from './routes/standard';
 import helloRoute from './routes/hello';
-import { PromiseHandler } from '@fastify/aws-lambda';
 
 import {
   serializerCompiler,
@@ -28,6 +29,9 @@ export async function app(fastify: FastifyInstance, opts: AppOptions) {
   //   dir: path.join(__dirname, 'plugins'),
   //   options: { ...opts },
   // });
+  fastify.register(cors, {
+    origin: ['http://localhost:4200'],
+  });
 
   fastify.register(fp);
   fastify.register(historyRoute);

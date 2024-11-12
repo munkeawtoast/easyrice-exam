@@ -19,8 +19,8 @@ export type RiceInspectionResultDatabaseGet = Pick<
 
 export type CreateRiceInspectionResultDatabasePk = Omit<
   RiceInspectionResult,
-  'id'
-> & { id?: string };
+  'id' | 'createDate'
+> & { id?: string; createDate?: string };
 
 export type RiceInspectionResultQueryOptions = {
   fromDate?: string;
@@ -69,11 +69,11 @@ export class RiceInspectionResultDatabase
     let condition = '#type = :type';
 
     if (options.fromDate && options.toDate) {
-      condition += ' AND dateTime BETWEEN :fromDate AND :toDate';
+      condition += ' AND #createDate BETWEEN :fromDate AND :toDate';
     } else if (options.fromDate) {
-      condition += ' AND dateTime >= :fromDate';
+      condition += ' AND #createDate >= :fromDate';
     } else if (options.toDate) {
-      condition += ' AND dateTime <= :toDate';
+      condition += ' AND #createDate <= :toDate';
     }
     const command = new QueryCommand({
       TableName: this.ddbTable,
@@ -85,6 +85,7 @@ export class RiceInspectionResultDatabase
       },
       ExpressionAttributeNames: {
         '#type': 'type',
+        '#createDate': 'createDate',
       },
       KeyConditionExpression: condition,
     });
@@ -116,7 +117,8 @@ export class RiceInspectionResultDatabase
       Item: {
         ...item,
         id: item.id ?? randomUUID(),
-      },
+        createDate: item.createDate ?? new Date().toISOString(),
+      } satisfies RiceInspectionResult,
     });
     await this.dynamodbClient.send(command);
   }

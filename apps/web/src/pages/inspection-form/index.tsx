@@ -10,20 +10,31 @@ import {
   FormMessage,
 } from '@libs/ui/form';
 import { Input } from '@libs/ui/input';
+import { Checkbox } from '@libs/ui/checkbox';
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-} from '@libs/ui/table';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@libs/ui/select';
 import { Card } from '@libs/ui/card';
 import { Button } from '@libs/ui/button';
 import { Calendar } from '@libs/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@libs/ui/popover';
 import z from 'zod';
 import { cn } from '@libs/ui/utils';
-import { CalendarIcon, Search } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
+import ContentPadding from '../../components/content-padding';
+import { CheckedState } from '@radix-ui/react-checkbox';
+import HistoryApi from '../../api/history.api';
+import {
+  ListStandardResponseDto,
+  SubStandardSchemaDto,
+} from '@libs/dto/standard';
+import { useEffect, useState } from 'react';
+import StandardApi from '../../api/standard.api';
+import { RiceRawAnalysis, RiceRawAnalysisSchema } from '@libs/models';
 type Props =
   | {
       isEditing: true;
@@ -35,37 +46,158 @@ type Props =
 
 const formSchema = z.object({
   name: z.string(),
-  standard: z.string(),
+  standardID: z.string(),
+  standardName: z.string(),
+  standardData: SubStandardSchemaDto.array(),
   file: z.any(),
   note: z.string().optional(),
-  price: z.number().optional(),
+  price: z.coerce.number().optional(),
+  samplingDate: z.date().optional(),
+  samplingPoint: z.array(z.string()),
 });
 
+const samplingPoints = [
+  {
+    id: 'frontend',
+    label: 'Front End',
+  },
+  {
+    id: 'backend',
+    label: 'Back End',
+  },
+  {
+    id: 'other',
+    label: 'Other',
+  },
+] as const;
+
 const InspectionFormPage = (props: Props) => {
+  const [standardSet, setStandardSet] = useState<ListStandardResponseDto>([]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+      samplingPoint: [],
+    },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  useEffect(() => {
+    (async function () {
+      const standards = await StandardApi.listStandard();
+      setStandardSet(standards);
+    })();
+  }, []);
+
+  const selectedItems = form.watch('samplingPoint') || [];
+
+  async function onSubmit({
+    file: files,
+    samplingDate,
+    ...values
+  }: z.infer<typeof formSchema>) {
+    const fileList = files as FileList;
+    const realFile = fileList.item(0);
+    let parsedAnalysis: RiceRawAnalysis | undefined = undefined;
+    if (realFile) {
+      try {
+        if (!realFile.type.includes('json')) {
+          throw new Error();
+        }
+        const text = await realFile.text();
+        const parsed = JSON.parse(text);
+        parsedAnalysis = RiceRawAnalysisSchema.parse(parsed);
+      } catch (e) {
+        window.alert('Invalid file.');
+        return;
+      }
+    }
+    await HistoryApi.createHistory({
+      ...values,
+      rawData: parsedAnalysis,
+      samplingDate: samplingDate?.toISOString(),
+    });
   }
+
+  const handleCheckboxChange = (checked: CheckedState, item: string) => {
+    form.setValue(
+      'samplingPoint',
+      checked
+        ? [...selectedItems, item]
+        : selectedItems.filter((value) => value !== item),
+      { shouldValidate: true } // This triggers validation on change
+    );
+  };
+
+  const handleStandardChange = (value: string) => {
+    form.setValue('standardID', value);
+    const standard = standardSet.find((item) => item.id === value)!;
+    form.setValue('standardName', standard.standardName);
+    form.setValue('standardData', standard.standardData);
+  };
+
   return (
-    <>
-      <Card className="p-6">
+    <ContentPadding header="Create Inspection">
+      <Card className="p-6 md:mx-32 xl:mx-72">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="flex justify-between gap-4">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
-                name="id"
+                name="name"
                 render={({ field }) => (
                   <FormItem className="flex flex-col justify-end">
-                    <FormLabel>ID</FormLabel>
+                    <FormLabel>Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Search with ID" {...field} />
+                      <Input placeholder="Placeholder" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormItem className="flex flex-col justify-end">
+                <FormLabel>Standard *</FormLabel>
+                <FormControl>
+                  <Select onValueChange={handleStandardChange}>
+                    <SelectTrigger className="">
+                      <SelectValue placeholder="Please select standard" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {standardSet.map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.standardName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <FormField
+                control={form.control}
+                name="file"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col justify-end">
+                    <FormLabel>Upload File</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        {...form.register('file')}
+                        placeholder="raw1.json"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <hr />
+
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col justify-end">
+                    <FormLabel>Note</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Placeholder" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -73,17 +205,50 @@ const InspectionFormPage = (props: Props) => {
               />
               <FormField
                 control={form.control}
-                name="fromDate"
+                name="price"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col justify-end">
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="10000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormLabel>Sampling Point</FormLabel>
+              <div className="flex justify-between">
+                {samplingPoints.map((item, index) => (
+                  <FormItem
+                    key={item.id}
+                    className="space-y-0 gap-2 flex-row flex items-center"
+                  >
+                    <FormControl>
+                      <Checkbox
+                        checked={selectedItems.includes(item.id)}
+                        onCheckedChange={(checked: CheckedState) =>
+                          handleCheckboxChange(checked, item.id)
+                        }
+                      />
+                    </FormControl>
+                    <FormLabel className="mt-0">{item.label}</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                ))}
+              </div>
+              <FormField
+                control={form.control}
+                name="samplingDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col justify-start">
-                    <FormLabel>From date</FormLabel>
+                    <FormLabel>Date/Time of Sampling</FormLabel>
                     <Popover>
                       <PopoverTrigger className="" asChild>
                         <FormControl>
                           <Button
                             variant={'outline'}
                             className={cn(
-                              'w-[240px] pl-3 text-left font-normal',
+                              'pl-3 text-left font-normal',
                               !field.value && 'text-muted-foreground'
                             )}
                           >
@@ -99,7 +264,9 @@ const InspectionFormPage = (props: Props) => {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={field.value}
+                          selected={
+                            field.value ? new Date(field.value) : undefined
+                          }
                           onSelect={field.onChange}
                           // disabled={(date) }
                           // disabled={(date) =>
@@ -114,18 +281,16 @@ const InspectionFormPage = (props: Props) => {
                 )}
               />
             </div>
-            <div className="flex justify-between gap-4">
-              <Button type="reset" variant="link" className="text-red-600">
-                Clear filter
+            <div className="flex justify-end gap-4">
+              <Button type="reset" variant="outline">
+                Cancel
               </Button>
-              <Button type="submit">
-                <Search /> Submit
-              </Button>
+              <Button type="submit">Submit</Button>
             </div>
           </form>
         </Form>
       </Card>
-    </>
+    </ContentPadding>
   );
 };
 
