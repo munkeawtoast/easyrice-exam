@@ -1,9 +1,12 @@
 # EasyriceExam
 
+Before running please conact me to get aws keys to run as the database is DynamoDB on my AWS personal account
+Please put them in `apps/api/example.env`
+
 ## Commands
 
-### run ddb instance locally
+To run frontend, backend
 
 ```
-docker compose -f docker-compose.dev.yaml up --detach
+nx run-many --parallel --target=serve --projects=api,web
 ```
