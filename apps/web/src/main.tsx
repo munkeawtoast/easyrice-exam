@@ -9,7 +9,6 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <StrictMode>
-    <Navbar />
     <RouterProvider router={router} />
   </StrictMode>
 );

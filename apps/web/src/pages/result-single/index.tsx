@@ -1,5 +1,5 @@
 import { CardContent, CardHeader, Card } from '@/ui/card';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ContentPadding from '../../components/content-padding';
 import InspectionResultItem from './inspection-result-item';
 import {
@@ -22,6 +22,7 @@ import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import HistoryApi from '../../api/history.api';
 import { SubStandardData } from '@libs/dto/standard';
+import { Button } from '@/ui/button';
 
 export type ResultSingleProps = {};
 
@@ -109,6 +110,14 @@ const ResultSingle = (props: ResultSingleProps) => {
             alt="Rice"
             className="w-full h-96 object-cover"
           />
+          <div className="flex space-x-2 pt-2 justify-end">
+            <Link to={`/history`}>
+              <Button variant={'outline'}>Back</Button>
+            </Link>
+            <Link to={`/standard/${id}`}>
+              <Button>Edit</Button>
+            </Link>
+          </div>
         </div>
         <div className="flex-1 p-4 text-card-foreground space-y-4 rounded-xl bg-gray-100">
           <Card>

@@ -79,6 +79,7 @@ export const GetHistoryApiSchema = {
   }),
   response: {
     200: GetHistoryResponseSchema,
+    404: z.string(),
   },
 } satisfies ApiSchema;
 export type GetHistoryApi = typeof GetHistoryApiSchema;

@@ -69,11 +69,11 @@ export class RiceInspectionResultDatabase
     let condition = '#type = :type';
 
     if (options.fromDate && options.toDate) {
-      condition += ' AND #createDate BETWEEN :fromDate AND :toDate';
+      condition += ' AND createDate BETWEEN :fromDate AND :toDate';
     } else if (options.fromDate) {
-      condition += ' AND #createDate >= :fromDate';
+      condition += ' AND createDate >= :fromDate';
     } else if (options.toDate) {
-      condition += ' AND #createDate <= :toDate';
+      condition += ' AND createDate <= :toDate';
     }
     const command = new QueryCommand({
       TableName: this.ddbTable,
@@ -85,7 +85,6 @@ export class RiceInspectionResultDatabase
       },
       ExpressionAttributeNames: {
         '#type': 'type',
-        '#createDate': 'createDate',
       },
       KeyConditionExpression: condition,
     });
@@ -112,13 +111,17 @@ export class RiceInspectionResultDatabase
   }
 
   async create(item: CreateRiceInspectionResultDatabasePk) {
+    const creatingItem = {
+      ...item,
+      id: item.id ?? randomUUID(),
+      createDate: item.createDate ?? new Date().toISOString(),
+    } satisfies RiceInspectionResult;
+
+    console.log('db', creatingItem.price);
+
     const command = new PutCommand({
       TableName: this.ddbTable,
-      Item: {
-        ...item,
-        id: item.id ?? randomUUID(),
-        createDate: item.createDate ?? new Date().toISOString(),
-      } satisfies RiceInspectionResult,
+      Item: creatingItem,
     });
     await this.dynamodbClient.send(command);
   }

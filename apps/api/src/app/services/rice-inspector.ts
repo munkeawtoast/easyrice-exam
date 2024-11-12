@@ -42,6 +42,7 @@ export class RiceInspectorService {
       standardName: record.standardName,
       samplingDate: record.samplingDate,
       samplingPoint: record.samplingPoint,
+      price: record.price,
     };
   }
 
@@ -54,6 +55,7 @@ export class RiceInspectorService {
       createDate: record.createDate,
       inspectionID: record.id,
       standardID: record.standardID,
+      price: record.price,
       note: record.note,
       standardName: record.standardName,
       samplingDate: record.samplingDate,
@@ -226,9 +228,6 @@ export class RiceInspectorService {
       name: key,
       value,
     }));
-    console.log(composition, defect);
-    console.log(standardData);
-    console.log(riceTypePercentage);
     const creatingItem = {
       name: item.name,
       createDate: item.createDate,
@@ -244,6 +243,8 @@ export class RiceInspectorService {
       price: item.price,
       type: this.baseRiceKey,
     } satisfies CreateRiceInspectionResultDatabasePk;
+
+    console.log('service', creatingItem.price);
 
     await this.riceInspectionResultDatabase.create(creatingItem);
     return this.transformToFullHistoryDto(creatingItem);

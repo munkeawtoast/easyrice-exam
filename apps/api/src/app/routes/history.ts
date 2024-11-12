@@ -58,10 +58,16 @@ export default async function (fastify: FastifyInstance) {
           url: '/:id',
           schema: GetHistoryApiSchema,
           handler: async (request, reply) => {
-            const record = await riceInspectorService.getRiceInspectionResult({
-              id: request.params.id,
-            });
-            return reply.code(200).send(record);
+            try {
+              const record = await riceInspectorService.getRiceInspectionResult(
+                {
+                  id: request.params.id,
+                }
+              );
+              return reply.code(200).send(record);
+            } catch (e) {
+              return reply.code(404).send('Not Found');
+            }
           },
         });
 
@@ -70,6 +76,9 @@ export default async function (fastify: FastifyInstance) {
           url: '/',
           schema: CreateHistoryApiSchema,
           handler: async (request, reply) => {
+            console.log('=========');
+            console.log('controller', request.body.price);
+            console.log('=========');
             const history =
               await riceInspectorService.createRiceInspectionResult(
                 request.body
@@ -80,7 +89,7 @@ export default async function (fastify: FastifyInstance) {
 
         route.route({
           method: 'PUT',
-          url: '/',
+          url: '/:inspectionID',
           schema: PutHistoryApiSchema,
           handler: async (request, reply) => {
             const newHistory =

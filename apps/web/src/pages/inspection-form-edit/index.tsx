@@ -28,26 +28,17 @@ import { CalendarIcon } from 'lucide-react';
 import ContentPadding from '../../components/content-padding';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import HistoryApi from '../../api/history.api';
-import {
-  ListStandardResponseDto,
-  SubStandardSchemaDto,
-} from '@libs/dto/standard';
-import { useEffect, useState } from 'react';
-import StandardApi from '../../api/standard.api';
-import { RiceRawAnalysis, RiceRawAnalysisSchema } from '@libs/models';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+
 type Props = {};
 
 const formSchema = z.object({
-  name: z.string(),
-  standardID: z.string(),
-  standardName: z.string(),
-  standardData: SubStandardSchemaDto.array(),
-  file: z.any(),
   note: z.string().optional(),
-  price: z.coerce.number().optional(),
-  samplingDate: z.date().optional(),
+  price: z.number().optional(),
   samplingPoint: z.array(z.string()),
+  samplingDate: z.date().optional(),
+  inspectionID: z.string(),
 });
 
 const samplingPoints = [
@@ -65,57 +56,50 @@ const samplingPoints = [
   },
 ] as const;
 
-const InspectionFormPage = (props: Props) => {
-  const [standardSet, setStandardSet] = useState<ListStandardResponseDto>([]);
+const InspectionFormEditPage = (props: Props) => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       samplingPoint: [],
+      inspectionID: id,
     },
   });
 
-  useEffect(() => {
-    (async function () {
-      const standards = await StandardApi.listStandard();
-      setStandardSet(standards);
-    })();
-  }, []);
+  useEffect(() => {}, []);
 
   const selectedItems = form.watch('samplingPoint') || [];
 
+  async function fetchRequiredData() {
+    const data = await HistoryApi.getHistory(id!);
+    console.log(data);
+
+    form.setValue('note', data.note);
+    form.setValue('price', data.price);
+    if (data.samplingDate) {
+      form.setValue('samplingDate', new Date(data.samplingDate));
+    }
+    form.setValue('samplingPoint', data.samplingPoint);
+  }
+
+  const goBack = () => {
+    window.history.back();
+  };
+
+  useEffect(() => {
+    fetchRequiredData();
+  }, []);
+
   async function onSubmit({
-    file: files,
     samplingDate,
     ...values
   }: z.infer<typeof formSchema>) {
-    const fileList = files as FileList;
-    const realFile = fileList.item(0);
-    let parsedAnalysis: RiceRawAnalysis | undefined = undefined;
-    if (realFile) {
-      try {
-        if (!realFile.type.includes('json')) {
-          throw new Error();
-        }
-        const text = await realFile.text();
-        const parsed = JSON.parse(text);
-        parsedAnalysis = RiceRawAnalysisSchema.parse(parsed);
-      } catch (e) {
-        window.alert('Invalid file.');
-        return;
-      }
-    }
-
-    const data = {
+    await HistoryApi.updateHistory({
       ...values,
-      rawData: parsedAnalysis,
+
       samplingDate: samplingDate?.toISOString(),
-    };
-
-    console.log(data);
-
-    const item = await HistoryApi.createHistory(data);
-    navigate(`/history/${item.inspectionID}`);
+    });
   }
 
   const handleCheckboxChange = (checked: CheckedState, item: string) => {
@@ -128,69 +112,12 @@ const InspectionFormPage = (props: Props) => {
     );
   };
 
-  const handleStandardChange = (value: string) => {
-    form.setValue('standardID', value);
-    const standard = standardSet.find((item) => item.id === value)!;
-    form.setValue('standardName', standard.standardName);
-    form.setValue('standardData', standard.standardData);
-  };
-
   return (
-    <ContentPadding header="Create Inspection">
+    <ContentPadding header={`Edit Inspection ID: ${id}`}>
       <Card className="p-6 md:mx-32 xl:mx-72">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-end">
-                    <FormLabel>Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Placeholder" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormItem className="flex flex-col justify-end">
-                <FormLabel>Standard *</FormLabel>
-                <FormControl>
-                  <Select onValueChange={handleStandardChange}>
-                    <SelectTrigger className="">
-                      <SelectValue placeholder="Please select standard" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {standardSet.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.standardName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-              <FormField
-                control={form.control}
-                name="file"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col justify-end">
-                    <FormLabel>Upload File</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        {...form.register('file')}
-                        placeholder="raw1.json"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <hr />
-
               <FormField
                 control={form.control}
                 name="note"
@@ -269,10 +196,6 @@ const InspectionFormPage = (props: Props) => {
                             field.value ? new Date(field.value) : undefined
                           }
                           onSelect={field.onChange}
-                          // disabled={(date) }
-                          // disabled={(date) =>
-                          //   date > new Date() || date < new Date('1900-01-01')
-                          // }
                           initialFocus
                         />
                       </PopoverContent>
@@ -283,7 +206,7 @@ const InspectionFormPage = (props: Props) => {
               />
             </div>
             <div className="flex justify-end gap-4">
-              <Button type="reset" variant="outline">
+              <Button onClick={() => navigate(-1)} variant="outline">
                 Cancel
               </Button>
               <Button type="submit">Submit</Button>
@@ -295,4 +218,4 @@ const InspectionFormPage = (props: Props) => {
   );
 };
 
-export default InspectionFormPage;
+export default InspectionFormEditPage;
