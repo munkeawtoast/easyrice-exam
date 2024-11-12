@@ -66,23 +66,25 @@ export class RiceInspectionResultDatabase
     query: RiceInspectionResultDatabasePk,
     options: BaseQueryOptions & RiceInspectionResultQueryOptions
   ): Promise<RiceInspectionResult[]> {
-    let condition = '';
+    let condition = '#type = :type';
 
     if (options.fromDate && options.toDate) {
-      condition += '#createDate BETWEEN :fromDate AND :toDate';
+      condition += ' AND #createDate BETWEEN :fromDate AND :toDate';
     } else if (options.fromDate) {
-      condition += '#createDate >= :fromDate';
+      condition += ' AND #createDate >= :fromDate';
     } else if (options.toDate) {
-      condition += '#createDate <= :toDate';
+      condition += ' AND #createDate <= :toDate';
     }
     const command = new QueryCommand({
       TableName: this.ddbTable,
       Limit: options?.limit ?? 50,
       ExpressionAttributeValues: {
+        ':type': query.type,
         ':fromDate': options?.fromDate,
         ':toDate': options?.toDate,
       },
       ExpressionAttributeNames: {
+        '#type': 'type',
         '#createDate': 'createDate',
       },
       KeyConditionExpression: condition,
@@ -92,16 +94,14 @@ export class RiceInspectionResultDatabase
   }
 
   async update(
-    { id }: RiceInspectionResultDatabaseGet,
+    key: RiceInspectionResultDatabaseGet,
     item: Prettify<Partial<Omit<RiceInspectionResult, 'id' | 'type'>>>
   ) {
     const { updateExpression, expressionAttribute, expressionAttributeNames } =
       this.createUpdateExpressions(item);
     const command = new UpdateCommand({
       TableName: this.ddbTable,
-      Key: {
-        id,
-      },
+      Key: key,
       UpdateExpression: `SET ${updateExpression.join(', ')}`,
       ExpressionAttributeValues: expressionAttribute,
       ExpressionAttributeNames: expressionAttributeNames,
@@ -111,14 +111,14 @@ export class RiceInspectionResultDatabase
     return response.Attributes as RiceInspectionResult;
   }
 
-  async create({ type, ...item }: CreateRiceInspectionResultDatabasePk) {
+  async create(item: CreateRiceInspectionResultDatabasePk) {
     const command = new PutCommand({
       TableName: this.ddbTable,
       Item: {
         ...item,
         id: item.id ?? randomUUID(),
         createDate: item.createDate ?? new Date().toISOString(),
-      },
+      } satisfies RiceInspectionResult,
     });
     await this.dynamodbClient.send(command);
   }
@@ -128,6 +128,7 @@ export class RiceInspectionResultDatabase
       TableName: this.ddbTable,
       Key: {
         id: query.id,
+        type: query.type,
       },
     });
     const getResult = await this.dynamodbClient.send(command);
@@ -139,9 +140,7 @@ export class RiceInspectionResultDatabase
       TransactItems: keys.map((key) => ({
         Delete: {
           TableName: this.ddbTable,
-          Key: {
-            id: key.id,
-          },
+          Key: key,
         },
       })),
     });
